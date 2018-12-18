@@ -14,7 +14,12 @@ class PhotoRepository
         $this->model = $model;
     }
 
-    public function imageableDel($imageable_ids, $imageable_type)
+    /**
+     * imageableDel
+     * @param  array  $imageable_ids
+     * @param  string $imageable_type
+     */
+    public function imageableDel(array $imageable_ids, string $imageable_type)
     {
         $this->model
             ->whereIn('imageable_id', $imageable_ids)

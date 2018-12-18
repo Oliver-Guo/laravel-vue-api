@@ -21,7 +21,7 @@ class RefreshToken extends BaseMiddleware
      *
      * @return mixed
      */
-    public function handle($request, Closure $next, $guardType)
+    public function handle($request, Closure $next)
     {
         $this->checkForToken($request);
 
@@ -37,10 +37,11 @@ class RefreshToken extends BaseMiddleware
 
                 $token = $this->auth->refresh();
 
-                Auth::guard($guardType)->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
+                auth()->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
             } catch (JWTException $exception) {
 
-                throw new UnauthorizedHttpException('jwt-auth', $exception->getMessage(), $exception, $exception->getCode());
+                throw new UnauthorizedHttpException('jwt-auth', '登入逾期請重新登入', $exception, $exception->getCode());
+
             }
 
         }

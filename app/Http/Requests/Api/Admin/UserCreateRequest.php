@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Topic;
+namespace App\Http\Requests\Api\Admin;
 
 use App\Http\Requests\Api\FormRequest;
 
-class TopicCategoryCreateRequest extends FormRequest
+class UserCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,10 @@ class TopicCategoryCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'topic_category.name'      => 'required',
-            'topic_category.is_online' => 'required|integer|in:0,1',
-            'topic_category.sort'      => 'integer',
+            'user.name'     => 'required|max:255',
+            'user.email'    => 'required|email|max:255',
+            'user.password' => 'required|alpha_num|min:6|confirmed',
+
         ];
     }
 }

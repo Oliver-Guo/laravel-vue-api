@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\TopicCategory;
 use App\Traits\DbModel;
+use Illuminate\Support\Collection;
 
 class TopicCategoryRepository
 {
@@ -14,7 +15,12 @@ class TopicCategoryRepository
         $this->model = $model;
     }
 
-    public function getList($search)
+    /**
+     * getList
+     * @param  array  $search
+     * @return Collection
+     */
+    public function getList(array $search): Collection
     {
         return $this->model
             ->select('id', 'name', 'sort', 'is_online')
@@ -27,7 +33,12 @@ class TopicCategoryRepository
             ->get();
     }
 
-    public function create($data)
+    /**
+     * create
+     * @param  array  $data
+     * @return TopicCategory
+     */
+    public function create(array $data): TopicCategory
     {
         $checkFields = [
             'name',
@@ -38,7 +49,12 @@ class TopicCategoryRepository
         return $this->checkAndCreate($data, $checkFields);
     }
 
-    public function update($id, $data)
+    /**
+     * update
+     * @param  TopicCategory $dbobj
+     * @param  array         $data
+     */
+    public function update(TopicCategory $dbobj, array $data)
     {
         $checkFields = [
             'name',
@@ -46,8 +62,6 @@ class TopicCategoryRepository
             'sort',
         ];
 
-        $this->checkAndUpdate($id, $data, $checkFields);
-
-        return;
+        $this->checkAndSave($dbobj, $data, $checkFields);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Topic;
+namespace App\Http\Requests\Api\Admin;
 
 use App\Http\Requests\Api\FormRequest;
 
@@ -32,7 +32,6 @@ class TopicCreateRequest extends FormRequest
             'topic.sort'              => 'integer',
             'tag_names'               => 'array',
             'article_ids'             => 'array',
-            'article_ids.*'           => 'integer',
         ];
     }
 }

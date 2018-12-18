@@ -13,4 +13,13 @@ class PermissionRepository
     {
         $this->model = $model;
     }
+
+    public function getAll()
+    {
+        return $this->model
+            ->select('name')
+            ->orderBy('name', 'ASC')
+            ->get()
+            ->pluck('name');
+    }
 }

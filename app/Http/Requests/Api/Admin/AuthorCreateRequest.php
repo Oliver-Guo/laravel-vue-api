@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Permission;
+namespace App\Http\Requests\Api\Admin;
 
 use App\Http\Requests\Api\FormRequest;
 
-class UserUpdateRequest extends FormRequest
+class AuthorCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class UserUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'user.name'     => 'required|max:255',
-            'user.password' => 'min:4|confirmed',
-
+            'author.name'        => 'required',
+            'author.description' => 'required',
+            'author.is_online'   => 'required|integer|in:0,1',
         ];
     }
 }

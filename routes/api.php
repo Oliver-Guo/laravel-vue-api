@@ -24,31 +24,23 @@ app('Dingo\Api\Exception\Handler')->register(function (Illuminate\Database\Eloqu
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
 
-    $api->post('admin/login', 'App\Http\Controllers\Api\Admin\AuthController@login');
+    $api->group(['middleware' => ['cors', 'apitimestamp']], function ($api) {
 
-    $api->group(['prefix' => 'admin', 'namespace' => 'App\Http\Controllers\Api\Admin', 'limit' => 100, 'expires' => 1], function ($api) {
+        $api->post('admin/login', 'App\Http\Controllers\Api\Admin\AuthController@login');
 
-        $api->get('logout', 'AuthController@logout');
-        $api->get('refresh', 'AuthController@refresh');
-        $api->get('me', 'AuthController@me');
+        $api->group(['prefix' => 'admin', 'namespace' => 'App\Http\Controllers\Api\Admin'], function ($api) {
 
-        $api->get('tag/rs_search/{name}', 'TagController@checkTag');
+            $api->get('logout', 'AuthController@logout');
+            $api->get('me', 'AuthController@me');
 
-        $api->group(['namespace' => 'Article'], function ($api) {
+            $api->get('tag/rs_search/{name}', 'TagController@rsSearch');
 
-            $api->get('article/rs_search/{keyword}', 'ArticleController@checkArticle');
+            $api->get('article/rs_search/{keyword}', 'ArticleController@rsSearch');
 
-        });
-
-        $api->group(['namespace' => 'Author'], function ($api) {
-
-            $api->get('author/all_list', 'AuthorController@allList');
+            $api->put('author/ch_is_online/{id}', 'AuthorController@chIsOnline');
+            $api->get('author/selects', 'AuthorController@selects');
             $api->resource('author', 'AuthorController', ['only' => ['index', 'store', 'show', 'update', 'destroy']]);
             $api->delete('author', 'AuthorController@deletes');
-
-        });
-
-        $api->group(['namespace' => 'Topic'], function ($api) {
 
             $api->put('topic_category/ch_is_online/{id}', 'TopicCategoryController@chIsOnline');
             $api->put('topic_category/ch_sort', 'TopicCategoryController@chSort');
@@ -59,15 +51,13 @@ $api->version('v1', function ($api) {
             $api->resource('topic', 'TopicController', ['only' => ['index', 'store', 'show', 'update', 'destroy']]);
             $api->delete('topic', 'TopicController@deletes');
 
-        });
-
-        $api->group(['namespace' => 'Permission'], function ($api) {
-
+            $api->get('permission_role/selects', 'RoleController@selects');
             $api->resource('permission_role', 'RoleController', ['only' => ['index', 'store', 'show', 'update', 'destroy']]);
             $api->get('permission_role_permissions', 'RoleController@permissions');
 
             $api->resource('permission_user', 'UserController', ['only' => ['index', 'store', 'show', 'update', 'destroy']]);
             $api->get('permission_user_roles', 'UserController@roles');
+
         });
     });
 

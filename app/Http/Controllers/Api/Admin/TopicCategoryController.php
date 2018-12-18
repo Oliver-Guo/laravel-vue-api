@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Topic;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\Admin\Controller;
-use App\Http\Requests\Api\Admin\Topic\TopicCategoryCreateRequest;
+use App\Http\Requests\Api\Admin\TopicCategoryCreateRequest;
 use App\Repositories\TopicCategoryRepository;
 use Illuminate\Http\Request;
 
@@ -54,7 +54,7 @@ class TopicCategoryController extends Controller
 
         $topicCategory = $this->topicCategoryRepository->getOne($id);
 
-        $this->topicCategoryRepository->update($id, $reqTopicCategory);
+        $this->topicCategoryRepository->update($topicCategory, $reqTopicCategory);
 
         return $this->response->array('');
     }
@@ -77,7 +77,9 @@ class TopicCategoryController extends Controller
     //隱藏顯示
     public function chIsOnline($id, Request $request)
     {
-        $this->topicCategoryRepository->updateOneField($id, 'is_online', $request->input('is_online'));
+        $reqIsOnline = (int) $request->is_online === 1 ? 1 : 0;
+
+        $this->topicCategoryRepository->updateOneField($id, 'is_online', $reqIsOnline);
 
         return $this->response->array(['code' => 1]);
     }

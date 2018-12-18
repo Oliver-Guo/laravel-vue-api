@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Permission;
+namespace App\Http\Requests\Api\Admin;
 
 use App\Http\Requests\Api\FormRequest;
 
@@ -27,21 +27,6 @@ class RoleUpdateRequest extends FormRequest
             'role.name'         => 'required',
             'role.display_name' => 'required',
             'permission_ids'    => 'array',
-            'permission_ids.*'  => 'integer',
-        ];
-    }
-
-    public function messages()
-    {
-        return config('constants.validatorMessages');
-    }
-
-    public function attributes()
-    {
-        return [
-            'role.name'         => '角色權限名稱',
-            'role.display_name' => '角色權限代號',
-            'permission_ids.*'  => '操作異常(請重新整理)',
         ];
     }
 }

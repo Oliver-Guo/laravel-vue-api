@@ -4,7 +4,6 @@ namespace App\Traits;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-
 trait DbModel
 {
     /**
@@ -38,11 +37,9 @@ trait DbModel
 
     public function getCheckOneField($field, $value)
     {
-        $result = $this->model
+        return $this->model
             ->where($field, $value)
             ->first();
-
-        return $result;
     }
 
     /**
@@ -77,6 +74,32 @@ trait DbModel
         return;
     }
 
+    // public function updateManyField($keyIds, $field, $value, $user = false)
+    // {
+    //     if (!is_array($keyIds)) {
+    //         return;
+    //     }
+
+    //     if (empty($keyIds['0'])) {
+    //         $key = (key($keyIds));
+    //         $ids = $keyIds[$key];
+    //     } else {
+    //         $key = 'id';
+    //         $ids = $keyIds;
+    //     }
+    //     $updateData[$field] = $value;
+
+    //     if ($user) {
+    //         $updateData['updated_user'] = is_null(auth()->user()) ? 1 : auth()->user()->id;
+    //     }
+
+    //     $this->model
+    //         ->whereIn($key, $ids)
+    //         ->update($updateData);
+
+    //     return;
+    // }
+
     public function checkAndCreate($data, $checkFields = null, $user = false)
     {
         $createData = [];
@@ -86,7 +109,7 @@ trait DbModel
         } else {
             foreach ($checkFields as $field) {
                 if (array_key_exists($field, $data)) {
-                    $createData[$field] = trim($data[$field]);
+                    $createData[$field] = (is_null($data[$field]) || (is_string($data[$field]) && strtolower($data[$field]) === 'null')) ? null : $data[$field];
                 }
             }
 
@@ -112,9 +135,13 @@ trait DbModel
 
         } else {
             foreach ($checkFields as $field) {
+
                 if (array_key_exists($field, $data)) {
-                    $dbObj->$field = trim($data[$field]);
+
+                    $dbObj->$field = (is_null($data[$field]) || (is_string($data[$field]) && strtolower($data[$field]) === 'null')) ? null : $data[$field];
+
                 }
+
             }
         }
 
@@ -144,7 +171,7 @@ trait DbModel
         } else {
             foreach ($checkFields as $field) {
                 if (array_key_exists($field, $data)) {
-                    $updateData[$field] = trim($data[$field]);
+                    $updateData[$field] = (is_null($data[$field]) || (is_string($data[$field]) && strtolower($data[$field]) === 'null')) ? null : $data[$field];
                 }
             }
         }

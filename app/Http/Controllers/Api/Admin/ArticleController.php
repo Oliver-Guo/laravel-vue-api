@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Article;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\Admin\Controller;
 use App\Repositories\ArticleRepository;
@@ -15,11 +15,10 @@ class ArticleController extends Controller
         $this->articleRepository = $articleRepository;
     }
 
-    public function checkArticle($keyword)
+    public function rsSearch($keyword)
     {
+        $article = $this->articleRepository->getRsSearch($keyword);
 
-        $Article = $this->articleRepository->getCheck($keyword);
-
-        return $this->response->array($Article);
+        return $this->response->array($article);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Admin\Author;
+namespace App\Http\Requests\Api\Admin;
 
 use App\Http\Requests\Api\FormRequest;
 
-class AuthorCreateRequest extends FormRequest
+class TopicCategoryCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class AuthorCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'author.name'        => 'required',
-            'author.description' => 'required',
-            'author.is_online'   => 'required|integer|in:0,1',
+            'topic_category.name'      => 'required',
+            'topic_category.is_online' => 'required|integer|in:0,1',
+            'topic_category.sort'      => 'integer',
         ];
     }
 }

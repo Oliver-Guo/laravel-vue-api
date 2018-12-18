@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Topic;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\Admin\Controller;
-use App\Http\Requests\Api\Admin\Topic\TopicCreateRequest;
+use App\Http\Requests\Api\Admin\TopicCreateRequest;
 use App\Repositories\TopicRepository;
 use App\Services\ManyToManyService;
 use App\Traits\UploadPhoto;
@@ -36,56 +36,27 @@ class TopicController extends Controller
 
         $topics = $this->topicRepository->getList($search);
 
-        $topics->load(['photo' => function ($query) {
-            $query->selectRaw('imageable_id,CONCAT(path,name) name');
-        }]);
-
-        $topics->load(['author' => function ($query) {
-            $query->selectRaw('id,name');
-        }]);
-
-        $topics->load(['topicCategory' => function ($query) {
-            $query->select('id', 'name');
-        }]);
-
-        $topics->load(['tag' => function ($query) {
-            $query->select('id', 'name');
-        }]);
-
         return $this->response->array($topics);
     }
 
     public function store(TopicCreateRequest $request)
     {
-        $reqTopic = $request->input('topic');
+        $reqTopic = $request->topic;
 
         $topic = $this->topicRepository->create($reqTopic);
 
-        $tag_names = (!empty($request->input('tag_names'))) ? $request->input('tag_names') : [];
-        $this->manyToManyService->relationTag($topic, $tag_names);
+        $tag_names = empty($request->input('tag_names')) ? [] : $request->input('tag_names');
+        $this->manyToManyService->relationTags($topic, $tag_names);
 
-        $reqArticleIds = (!empty($request->input('article_ids'))) ? $request->input('article_ids') : [];
-        $this->manyToManyService->relation($topic, 'article', $reqArticleIds, ['sort' => 1]);
+        $reqArticleIds = empty($request->input('article_ids')) ? [] : $request->input('article_ids');
+        $this->manyToManyService->relation($topic, 'articles', $reqArticleIds, ['sort' => 1]);
 
         return $this->uploadPhoto($request, 'topic', $topic);
     }
 
     public function show($id)
     {
-        $topic = $this->topicRepository->getOne($id);
-
-        $topic->load(['photo' => function ($query) {
-            $query->selectRaw('imageable_id,CONCAT(path,name) name');
-        }]);
-
-        $topic->load(['article' => function ($query) {
-            $query->selectRaw('id,title')
-                ->orderBy('article_topic.sort', 'asc');
-        }]);
-
-        $topic->load(['tag' => function ($query) {
-            $query->selectRaw('id,name');
-        }]);
+        $topic = $this->topicRepository->getShow($id);
 
         return $this->response->array($topic);
     }
@@ -94,15 +65,15 @@ class TopicController extends Controller
     {
         $topic = $this->topicRepository->getOne($id);
 
-        $tag_names = (!empty($request->input('tag_names'))) ? $request->input('tag_names') : [];
-        $this->manyToManyService->relationTag($topic, $tag_names);
+        $tag_names = empty($request->input('tag_names')) ? [] : $request->input('tag_names');
+        $this->manyToManyService->relationTags($topic, $tag_names);
 
-        $reqArticleIds = (!empty($request->input('article_ids'))) ? $request->input('article_ids') : [];
-        $this->manyToManyService->relation($topic, 'article', $reqArticleIds, ['sort' => 1]);
+        $reqArticleIds = empty($request->input('article_ids')) ? [] : $request->input('article_ids');
+        $this->manyToManyService->relation($topic, 'articles', $reqArticleIds, ['sort' => 1]);
 
-        $reqTopic = $request->input('topic');
+        $reqTopic = $request->topic;
 
-        $this->topicRepository->update($id, $reqTopic);
+        $this->topicRepository->update($topic, $reqTopic);
 
         return $this->uploadPhoto($request, 'topic', $topic);
     }
@@ -124,7 +95,10 @@ class TopicController extends Controller
 
     public function chIsOnline($id, Request $request)
     {
-        $this->topicRepository->updateOneField($id, 'is_online', $request->input('is_online'));
+
+        $reqIsOnline = (int) $request->is_online === 1 ? 1 : 0;
+
+        $this->topicRepository->updateOneField($id, 'is_online', $reqIsOnline);
 
         return $this->response->array(['code' => 1]);
     }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Role;
 use App\Traits\DbModel;
+use Illuminate\Support\Collection;
 
 class RoleRepository
 {
@@ -14,41 +15,71 @@ class RoleRepository
         $this->model = $model;
     }
 
-    public function getList()
+    /**
+     * getList
+     * @return Collection
+     */
+    public function getList(): Collection
     {
-        $result = $this->model
+        return $this->model
             ->get();
 
-        return $result;
     }
 
-    public function create($data)
+    /**
+     * getSelects
+     * @return Collection
+     */
+    public function getSelects(): Collection
     {
-        $checkFields = array(
+        return $this->model
+            ->select('id', 'display_name')
+            ->orderBy('id', 'asc')
+            ->get();
+    }
+
+    /**
+     * create
+     * @param  array  $data
+     * @return Role
+     */
+    public function create(array $data): Role
+    {
+        $checkFields = [
             'display_name',
             'name',
-        );
+        ];
 
-        $createData = $this->checkAndCreate($data, $checkFields, true);
+        return $this->checkAndCreate($data, $checkFields, true);
 
-        return $createData;
     }
 
-    public function update($id, $data)
+    /**
+     * update
+     * @param  Role   $dbobj
+     * @param  array  $data
+     */
+    public function update(Role $dbobj, array $data)
     {
-        $checkFields = array(
+        $checkFields = [
             'display_name',
             'name',
-        );
+        ];
 
-        $this->checkAndUpdate($id, $data, $checkFields, true);
+        $this->checkAndSave($dbobj, $data, $checkFields, true);
 
-        return;
     }
 
-    public function checkNoUnique($name)
+    /**
+     * checkNoUnique
+     * @param  string $name
+     * @return int
+     */
+    public function checkNoUnique(string $name): int
     {
-        return $this->model->where('name', $name)->count();
+        return $this->model
+            ->where('name', $name)
+            ->count();
     }
 
 }

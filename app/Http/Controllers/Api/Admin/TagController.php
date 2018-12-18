@@ -15,10 +15,10 @@ class TagController extends Controller
         $this->tagRepository = $tagRepository;
     }
 
-    public function checkTag($name)
+    public function rsSearch($name)
     {
 
-        $tag = $this->tagRepository->getCheck($name);
+        $tag = $this->tagRepository->getRsSearch($name);
 
         return $this->response->array($tag);
     }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Article;
 use App\Traits\DbModel;
+use Illuminate\Support\Collection;
 
 class ArticleRepository
 {
@@ -14,9 +15,13 @@ class ArticleRepository
         $this->model = $model;
     }
 
-    public function getCheck($keyword)
+    /**
+     * getRsSearch
+     * @param  string $keyword
+     * @return Collection
+     */
+    public function getRsSearch(string $keyword): Collection
     {
-
         return $this->model
             ->select('id', 'title')
             ->where(function ($query) use ($keyword) {

@@ -14,19 +14,28 @@ class ManyToManyService
         $this->tagRepository = $tagRepository;
     }
 
+    /**
+     * relation 多對多關聯
+     * @param  Model  $fromModel 主物件
+     * @param  string $toOrm orm對象
+     * @param  array  $reqIds 關聯ids
+     * @param  array  $fields 關聯附加資訊
+     */
     public function relation(Model $fromModel, string $toOrm, array $reqIds, array $fields = [])
     {
         $syncIds = [];
 
         //沒有關聯
         if (empty($reqIds)) {
-            return $fromModel->$toOrm()->sync($syncIds);
+            $fromModel->$toOrm()->sync($syncIds);
+            return;
         }
 
         //沒有額外其他欄位賦予值
         if (empty($fields)) {
             $syncIds = $reqIds;
-            return $fromModel->$toOrm()->sync($syncIds);
+            $fromModel->$toOrm()->sync($syncIds);
+            return;
         }
 
         //有額外其他欄位賦予值
@@ -47,15 +56,23 @@ class ManyToManyService
 
         }
 
-        return $fromModel->$toOrm()->sync($syncIds);
+        $fromModel->$toOrm()->sync($syncIds);
+
+        return;
     }
 
-    public function relationTag(Model $fromModel, array $reqNames)
+    /**
+     * relationTags 多對多關聯TAG
+     * @param  Model  $fromModel 主物件
+     * @param  array  $reqNames  TAG名稱
+
+     */
+    public function relationTags(Model $fromModel, array $reqNames)
     {
         $syncIds = [];
 
         if (empty($reqNames)) {
-            return $fromModel->tag()->sync($syncIds);
+            return $fromModel->tags()->sync($syncIds);
         }
 
         foreach ($reqNames as $reqName) {
@@ -71,6 +88,6 @@ class ManyToManyService
 
         }
 
-        return $fromModel->tag()->sync($syncIds);
+        $fromModel->tags()->sync($syncIds);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Tag;
 use App\Traits\DbModel;
+use Illuminate\Support\Collection;
 
 class TagRepository
 {
@@ -14,7 +15,12 @@ class TagRepository
         $this->model = $model;
     }
 
-    public function getCheck($name)
+    /**
+     * getRsSearch
+     * @param  string $name
+     * @return Collection
+     */
+    public function getRsSearch(string $name): Collection
     {
 
         return $this->model

@@ -12,10 +12,6 @@ class Topic extends Model
 
     protected $hidden = ['pivot'];
 
-    protected $casts = [
-        'is_online' => 'integer',
-    ];
-
     public static function boot()
     {
         parent::boot();
@@ -23,8 +19,8 @@ class Topic extends Model
         static::deleting(function ($topic) {
 
             $topic->photo()->delete();
-            $topic->tag()->sync([]);
-            $topic->article()->sync([]);
+            $topic->tags()->sync([]);
+            $topic->articles()->sync([]);
 
             return true;
         });
@@ -50,12 +46,12 @@ class Topic extends Model
         return $this->belongsTo('App\Models\Author');
     }
 
-    public function article()
+    public function articles()
     {
         return $this->belongsToMany('App\Models\Article');
     }
 
-    public function tag()
+    public function tags()
     {
         return $this->belongsToMany('App\Models\Tag');
     }

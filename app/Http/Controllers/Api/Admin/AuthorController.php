@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin\Author;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Api\Admin\Controller;
-use App\Http\Requests\Api\Admin\Author\AuthorCreateRequest;
+use App\Http\Requests\Api\Admin\AuthorCreateRequest;
 use App\Repositories\AuthorRepository;
 use App\Traits\UploadPhoto;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ class AuthorController extends Controller
         $this->middleware('permission:author_list', ['only' => ['index']]);
         $this->middleware('permission:author_add', ['only' => ['store']]);
         $this->middleware('permission:author_edit', ['only' => ['show', 'update']]);
-        $this->middleware('permission:author_del', ['only' => ['destroy', 'deletes']]);
+        $this->middleware('permission:author_del', ['only' => ['destroy']]);
         $this->authorRepository = $authorRepository;
     }
 
@@ -30,10 +30,6 @@ class AuthorController extends Controller
         $search = $request->all();
 
         $authors = $this->authorRepository->getList($search);
-
-        $authors->load(['photo' => function ($query) {
-            $query->selectRaw('imageable_id,CONCAT(path,name) name');
-        }]);
 
         return $this->response->array($authors);
     }
@@ -48,30 +44,27 @@ class AuthorController extends Controller
         return $this->uploadPhoto($request, 'author', $author);
     }
 
-    public function show($id)
+    public function show(int $id)
     {
 
-        $author = $this->authorRepository->getOne($id);
-
-        $author->load(['photo' => function ($query) {
-            $query->selectRaw('imageable_id,CONCAT(path,name) name');
-        }]);
+        $author = $this->authorRepository->getShow($id);
 
         return $this->response->array($author);
     }
 
-    public function update($id, AuthorCreateRequest $request)
+    public function update(int $id, AuthorCreateRequest $request)
     {
+        return $this->response->array($request->all());
         $reqAuthor = $request->input('author');
 
         $author = $this->authorRepository->getOne($id);
 
-        $this->authorRepository->update($id, $reqAuthor);
+        $this->authorRepository->update($author, $reqAuthor);
 
         return $this->uploadPhoto($request, 'author', $author);
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $author = $this->authorRepository->getOne($id);
 
@@ -88,9 +81,19 @@ class AuthorController extends Controller
         return $this->response->array('');
     }
 
-    public function allList()
+    //隱藏顯示
+    public function chIsOnline(int $id, Request $request)
     {
-        $result = $this->authorRepository->getAllList();
+        $reqIsOnline = (int) $request->is_online === 1 ? 1 : 0;
+
+        $this->authorRepository->updateOneField($id, 'is_online', $reqIsOnline);
+
+        return $this->response->array(['code' => 1]);
+    }
+
+    public function selects()
+    {
+        $result = $this->authorRepository->getSelects();
 
         return $this->response->array($result);
     }

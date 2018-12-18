@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Author;
 use App\Traits\DbModel;
+use Illuminate\Support\Collection;
 
 class AuthorRepository
 {
@@ -14,22 +15,57 @@ class AuthorRepository
         $this->model = $model;
     }
 
-    public function getList(array $search)
+    /**
+     * getList
+     * @param  array  $search
+     * @return array
+     */
+    public function getList(array $search): array
     {
-        $paginate = (!empty($search['paginate']) && (int) $search['paginate'] > 0) ? $search['paginate'] : 20;
+        $paginate = (!empty($search['paginate']) && (int) $search['paginate'] > 0) ? $search['paginate'] : 10;
 
-        return $this->model
+        $data = $this->model
             ->select('id', 'name', 'is_online')
             ->where(function ($query) use ($search) {
                 if (!empty($search['keyword'])) {
                     $query->where('name', 'like', '%' . $search['keyword'] . '%');
                 }
             })
+            ->with(['photo' => function ($query) {
+                $query->selectRaw('imageable_id,CONCAT(path,name) name');
+            }])
             ->orderBy('id', 'asc')
             ->paginate($paginate);
+
+        return [
+            'data'         => $data->items(),
+            'current_page' => $data->currentPage(),
+            'per_page'     => $data->perPage(),
+            'total'        => $data->total(),
+        ];
+
     }
 
-    public function getAllList()
+    /**
+     * getShow
+     * @param  int    $id
+     * @return Author
+     */
+    public function getShow(int $id): Author
+    {
+        return $this->model
+            ->where('id', $id)
+            ->with(['photo' => function ($query) {
+                $query->selectRaw('imageable_id,CONCAT(path,name) name');
+            }])
+            ->first();
+    }
+
+    /**
+     * getSelects
+     * @return Collection
+     */
+    public function getSelects(): Collection
     {
         return $this->model
             ->select('id', 'name')
@@ -37,7 +73,12 @@ class AuthorRepository
             ->get();
     }
 
-    public function create($data)
+    /**
+     * create
+     * @param  array  $data
+     * @return Author
+     */
+    public function create(array $data): Author
     {
         $checkFields = [
             'name',
@@ -52,7 +93,12 @@ class AuthorRepository
         return $this->checkAndCreate($data, $checkFields);
     }
 
-    public function update($id, $data)
+    /**
+     * update
+     * @param  Author $dbobj
+     * @param  array  $data
+     */
+    public function update(Author $dbobj, array $data)
     {
         $checkFields = [
             'name',
@@ -64,19 +110,8 @@ class AuthorRepository
             'is_online',
         ];
 
-        $this->checkAndUpdate($id, $data, $checkFields);
+        $this->checkAndSave($dbobj, $data, $checkFields);
 
-        return;
     }
 
-    public function getWillDel(array $ids)
-    {
-
-        return $this->model
-            ->select('id')
-            ->whereIn('id', $ids)
-            ->with('photo')
-            ->withCount('article')
-            ->get();
-    }
 }
